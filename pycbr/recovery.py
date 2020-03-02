@@ -59,8 +59,12 @@ class Recovery:
 
         self.searcher = NearestNeighbors(metric=self.distance)
 
+        # Training df
         self.df = None
+        # Transformed training df (possibly dropping instances)
         self.transformed = None
+        # Index of the transformed instances in the original df
+        self._index = None
 
     def _deal_with_na(self, X):
         """Transform a dataframe according to the na_strategy of the instance"""
@@ -86,7 +90,7 @@ class Recovery:
         X2 = self._deal_with_na(X[[x[0] for x in self.attributes]])
 
         # Save the index for later
-        index = X2.index.copy()
+        self._index = X2.index.copy()
 
         # Transform according to similarities (numpy array)
         self.transformed = self.transformer.fit_transform(X2)
@@ -95,7 +99,7 @@ class Recovery:
         self.searcher.fit(self.transformed)
 
         # Store the transformed CB as a dataframe
-        self.transformed = pd.DataFrame(self.transformed, index=index, columns=[x[0] for x in self.attributes])
+        self.transformed = pd.DataFrame(self.transformed, index=self._index, columns=[x[0] for x in self.attributes])
 
     def find(self, X, k):
         """
@@ -112,4 +116,4 @@ class Recovery:
         distances, neigh = self.searcher.kneighbors(self.transformer.transform(X[[x[0] for x in self.attributes]]), k)
 
         # Note NearestNeighbors returns indices from its input. Hence, iloc and not loc must be used in the dataframe
-        return [(self.transformed.iloc[n], 1 - d) for n, d in zip(neigh, distances)]
+        return [(self.df.loc[self._index[n]], 1 - d) for n, d in zip(neigh, distances)]
