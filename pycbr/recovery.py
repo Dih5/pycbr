@@ -27,7 +27,7 @@ class _WeightedDistance:
 class Recovery:
     """A case recovery system"""
 
-    def __init__(self, attributes, na_strategy="drop", na_fill="n.a."):
+    def __init__(self, attributes, na_strategy="drop", na_fill="n.a.", algorithm="auto"):
         """
 
         Args:
@@ -40,6 +40,9 @@ class Recovery:
                                - "replace": Replace na with a special value provided by the na_fill parameter.
                                          Similarity functions must be compatible with it.
             na_fill: A value used to replace na. Should be compatible with the Attribute instances.
+            algorithm (str): Method to retrieve the nearest neighbours. Available options are "auto", "ball_tree",
+                             "kd_tree", and "brute". If the attribute parameter is not actually defining a metric
+                             (e.g., non-transitive) the "brute" method must be used.
         """
         self.attributes = attributes
         self.na_strategy = na_strategy.lower()
@@ -57,7 +60,7 @@ class Recovery:
 
         self.distance = _WeightedDistance([a[1].similarity for a in attributes], weights=self.weights)
 
-        self.searcher = NearestNeighbors(metric=self.distance)
+        self.searcher = NearestNeighbors(metric=self.distance, algorithm=algorithm)
 
         # Training df
         self.df = None
