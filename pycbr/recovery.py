@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 from sklearn.compose import ColumnTransformer
 
@@ -26,17 +27,23 @@ class _WeightedDistance:
 class Recovery:
     """A case recovery system"""
 
-    def __init__(self, attributes, nafill="n.a."):
+    def __init__(self, attributes, na_strategy="drop", na_fill="n.a."):
         """
 
         Args:
             attributes (list of tuples): A list of 3-tuples with attribute name, Attribute instance defining its
                                          similarity and a weight. A list of 2-tuples can also be given if weight is
                                          uniform.
-            nafill: A value used to replace na. Should be compatible with the Attribute instances.
+            na_strategy (str): Method to deal with not available data. Possible options are:
+                               - "drop": Ignore the cases with not available values (among those defining the
+                                         similarity)
+                               - "replace": Replace na with a special value provided by the na_fill parameter.
+                                         Similarity functions must be compatible with it.
+            na_fill: A value used to replace na. Should be compatible with the Attribute instances.
         """
         self.attributes = attributes
-        self.nafill = nafill
+        self.na_strategy = na_strategy.lower()
+        self.na_fill = na_fill
 
         if any(len(x) == 3 for x in attributes):  # At least one weight
             # An error may raise if a weight is absent
@@ -53,6 +60,16 @@ class Recovery:
         self.searcher = NearestNeighbors(metric=self.distance)
 
         self.df = None
+        self.transformed = None
+
+    def _deal_with_na(self, X):
+        """Transform a dataframe according to the na_strategy of the instance"""
+        if self.na_strategy == "drop":
+            return X.dropna(subset=[x[0] for x in self.attributes])
+        elif self.na_strategy == "replace":
+            return X.fillna(self.na_fill)
+        else:
+            raise ValueError("Invalid na_strategy: %s" % self.na_strategy)
 
     def fit(self, X):
         """
@@ -62,8 +79,23 @@ class Recovery:
             X (pd.DataFrame): A dataframe with the cases.
 
         """
-        self.searcher.fit(self.transformer.fit_transform(X.fillna(self.nafill)))
+        # Store the original CB
         self.df = X
+
+        # Imputate/drop
+        X2 = self._deal_with_na(X[[x[0] for x in self.attributes]])
+
+        # Save the index for later
+        index = X2.index.copy()
+
+        # Transform according to similarities (numpy array)
+        self.transformed = self.transformer.fit_transform(X2)
+
+        # Fit the neighbour search
+        self.searcher.fit(self.transformed)
+
+        # Store the transformed CB as a dataframe
+        self.transformed = pd.DataFrame(self.transformed, index=index, columns=[x[0] for x in self.attributes])
 
     def find(self, X, k):
         """
@@ -77,6 +109,7 @@ class Recovery:
             list of (pandas.DataFrame, np.array of float): List of dataframes with the most similar cases and
                                                            similarity scores.
         """
-        distances, neigh = self.searcher.kneighbors(self.transformer.transform(X.fillna(self.nafill)), k)
+        distances, neigh = self.searcher.kneighbors(self.transformer.transform(X[[x[0] for x in self.attributes]]), k)
 
-        return [(self.df.iloc[n], 1 - d) for n, d in zip(neigh, distances)]
+        # Note NearestNeighbors returns indices from its input. Hence, iloc and not loc must be used in the dataframe
+        return [(self.transformed.iloc[n], 1 - d) for n, d in zip(neigh, distances)]
