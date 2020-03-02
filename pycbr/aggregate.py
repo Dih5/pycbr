@@ -1,6 +1,8 @@
 from collections import defaultdict
 import operator
 
+import pandas as pd
+
 
 class Aggregate:
     """An aggregation procedure to extract solutions from a set of cases"""
@@ -42,3 +44,22 @@ class MajorityAggregate(Aggregate):
             d[self._f(n)] += s if self.weighted else 1
 
         return max(d.items(), key=operator.itemgetter(1))[0]
+
+
+class ColumnRankAggregate(Aggregate):
+    """Solution aggregation by making a ranking of values in a column, possible weighted by similarity"""
+
+    def __init__(self, attributes, true_values=(True,), weighted=True):
+        super().__init__()
+        self.attributes = attributes
+        self.true_values = true_values
+        self.weighted = weighted
+
+    def aggregate(self, neighbours, similarity):
+        if not self.weighted:
+            n = len(neighbours)
+            r = {a: sum(neighbours[a].apply(lambda x: x in self.true_values)) / n for a in self.attributes}
+        else:
+            s = pd.Series(similarity, index=neighbours.index) / sum(similarity)
+            r = {a: sum(neighbours[a].apply(lambda x: x in self.true_values) * s) for a in self.attributes}
+        return sorted(list(r.items()), key=operator.itemgetter(1), reverse=True)
