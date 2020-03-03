@@ -1,10 +1,14 @@
+"""
+Module with models to define attribute similarity
+"""
+
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, QuantileTransformer
 from sklearn import base
 
 
 class Attribute(base.TransformerMixin, base.BaseEstimator):
-    """Attribute class. Defines how an attribute is transformed and how the similarity is calculated"""
+    """Generic attribute class. Defines how an attribute is transformed and how the similarity is calculated"""
 
     def __init__(self):
         pass
@@ -14,7 +18,12 @@ class Attribute(base.TransformerMixin, base.BaseEstimator):
 
 
 class LinearAttribute(Attribute):
-    """A continuous attribute whose similarity is measured with a linear function"""
+    """A continuous attribute whose similarity is measured with a linear function
+
+    The attribute similarity function is defined by
+    :math:`\\mathrm{sim}_a(x, y)= \\max\\left(1-\\frac{\\left|x-y\\right|}{a},0\\right)`
+
+    """
 
     def __init__(self, max_value=None):
         super().__init__()
@@ -33,7 +42,13 @@ class LinearAttribute(Attribute):
 
 
 class QuantileLinearAttribute(Attribute):
-    """A continuous attribute whose similarity is measured with a linear function on the quantiles"""
+    """A continuous attribute whose similarity is measured with a linear function on the quantiles
+
+    The attribute similarity function is defined by
+    :math:`\\mathrm{sim}(x, y)= 1-\\left|Q_A(x)-Q_A(y)\\right|`, where :math:`Q_A` is the (sample) quantile function
+    for the attribute in consideration.
+
+    """
 
     def __init__(self):
         super().__init__()
@@ -52,7 +67,12 @@ class QuantileLinearAttribute(Attribute):
 
 
 class KroneckerAttribute(Attribute):
-    """A (possibly) categorical attribute whose similarity is 1 if equal or 0 otherwise"""
+    """A (possibly) categorical attribute whose similarity is 1 if equal or 0 otherwise
+
+    The attribute similarity function is defined by
+    :math:`\\mathrm{sim}(x, y)= \\delta_{x,y}`
+
+    """
 
     def __init__(self, encode=True, undefined=("n.a.",)):
         super().__init__()
@@ -83,9 +103,16 @@ class KroneckerAttribute(Attribute):
 
 
 class LinearOrdinalAttribute(Attribute):
-    """A (possibly) categorical attribute whose similarity is linear wrt a scale"""
+    """A (possibly) categorical attribute whose similarity is linear with respect to a scale"""
 
     def __init__(self, order, undefined=("n.a.",)):
+        """
+
+        Args:
+            order (list): List of values, defining their ordering.
+            undefined (iterable): Values which are recognized, but not comparable to the ranking. When such a value is
+                                  found, the similarity returned is nan.
+        """
         super().__init__()
         self.order = order
         self.undefined = undefined

@@ -1,3 +1,7 @@
+"""
+Module providing the functionality to build a recovery system
+"""
+
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors

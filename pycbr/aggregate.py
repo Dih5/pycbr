@@ -1,3 +1,7 @@
+"""
+Module with aggregation functions to obtain a solution from a set of cases (and weights)
+"""
+
 from collections import defaultdict
 import operator
 
