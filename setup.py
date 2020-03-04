@@ -25,7 +25,9 @@ setup(author="Dih5",
       keywords=[],
       name='pycbr',
       packages=find_packages(include=['pycbr'], exclude=["demos", "tests", "docs"]),
-      install_requires=["numpy", "pandas", "scikit-learn"],
+      install_requires=["numpy", "pandas", "scikit-learn",
+                        "flask", "flask-restplus", "flask-cors"
+                        ],
       url='https://github.com/dih5/pycbr',
       version='0.1.0',
 
