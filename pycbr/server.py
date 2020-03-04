@@ -51,26 +51,26 @@ logger = logging.getLogger(__name__)
 setup_logging()
 
 
-class CBR_Flask(Flask):
+class CBRFlask:
     def __init__(self, import_name, case_base, recovery, aggregator):
-        super().__init__(import_name)
-        CORS(self)
+        self.app = Flask(import_name)
+        CORS(self.app)
 
-        self.api = Api(app=self, version=__version__, title="pyCBR", description="pyCBR generated API REST")
+        self.api = Api(app=self.app, version=__version__, title="pyCBR", description="pyCBR generated API REST")
         self.api_namespace = self.api.namespace("api", description="General methods")
 
-        self.config.update(
+        self.app.config.update(
             ERROR_404_HELP=False,  # No "but did you mean" messages
             RESTPLUS_MASK_SWAGGER=False,
         )
 
         # Log POST bodies
-        @self.before_request
+        @self.app.before_request
         def log_request_info():
-            # self.logger.debug('Headers: %s', request.headers)
+            # self.app.logger.debug('Headers: %s', request.headers)
             data = request.get_data()
             if data:
-                self.logger.info('Body: %s', data.decode())
+                self.app.logger.info('Body: %s', data.decode())
 
         self.case_base = case_base
 
