@@ -64,7 +64,7 @@ class CBRFlask:
         self.app = Flask(import_name)
         CORS(self.app)
 
-        self.api = Api(app=self.app, version=__version__, title="import_name", description="A pyCBR generated CBR API")
+        self.api = Api(app=self.app, version=__version__, title=import_name, description="A pyCBR generated CBR API")
         self.api_namespace = self.api.namespace("api", description="General methods")
 
         self.app.config.update(
