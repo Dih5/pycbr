@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+"""
+Module providing the functionality to build Flask WSGI applications for the CBR
+"""
 import logging
 import logging.config
 import os

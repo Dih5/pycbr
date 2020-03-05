@@ -12,6 +12,14 @@ pycbr.aggregate module
    :undoc-members:
    :show-inheritance:
 
+pycbr.casebase module
+---------------------
+
+.. automodule:: pycbr.casebase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pycbr.models module
 -------------------
 
@@ -24,6 +32,14 @@ pycbr.recovery module
 ---------------------
 
 .. automodule:: pycbr.recovery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pycbr.server module
+-------------------
+
+.. automodule:: pycbr.server
    :members:
    :undoc-members:
    :show-inheritance:

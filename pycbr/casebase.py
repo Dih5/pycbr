@@ -1,3 +1,7 @@
+"""
+Module providing the functionality to define case bases
+"""
+
 import pandas as pd
 
 

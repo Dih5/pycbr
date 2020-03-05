@@ -25,7 +25,8 @@ pip3 install -e '.[docs,test]'
 Mind the quotes.
 
 ## Documentation
-To generate the documentation, the *docs* extra dependencies must be installed.
+To generate the documentation, the *docs* extra dependencies must be installed. Furthermore, **pandoc** must be
+available in your system.
 
 To generate an html documentation with sphinx run:
 ```

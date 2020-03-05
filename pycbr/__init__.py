@@ -11,6 +11,19 @@ class CBR:
 
     def __init__(self, case_base, recovery_model, aggregator=None, refit_always=True, create_server=True,
                  server_name="pycbr"):
+        """
+
+        Args:
+            case_base (casebase.CaseBase): An instance defining how the case base persistence is handled.
+            recovery_model (recovery.Recovery): Instance defining how similarity is measured and how the search is
+                                                performed.
+            aggregator (aggregate.Aggregate): Aggregation procedure to propose a solution from a set of cases.
+            refit_always (bool): Whether to refit the similarities whenever a case is modified. Might be deactivated
+                                 for large case bases for performance reasons.
+            create_server (bool): Whether to create the Flask WSGI app.
+            server_name (str): Name to assign to the server.
+
+        """
         self.case_base = case_base
         self.recovery_model = recovery_model
         self.aggregator = aggregator
@@ -51,6 +64,7 @@ class CBR:
             case_id: An identifier of the id.
 
         Returns:
+            pandas.Series: The case found.
 
         """
         df = self.get_pandas()
