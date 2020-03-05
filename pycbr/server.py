@@ -9,7 +9,7 @@ import coloredlogs
 import yaml
 import pandas as pd
 
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_cors import CORS
 from flask_restplus import Api, Resource, fields
 
@@ -51,12 +51,19 @@ logger = logging.getLogger(__name__)
 setup_logging()
 
 
+def _pandas_to_python(instance):
+    """Convert a pandas object to a standard python object"""
+    # This patch is is due to pd.DataFrame.to_dict returning numpy types
+    # Cf. https://github.com/pandas-dev/pandas/issues/16048
+    return json.loads(instance.to_json())
+
+
 class CBRFlask:
-    def __init__(self, import_name, case_base, recovery, aggregator):
+    def __init__(self, import_name, cbr):
         self.app = Flask(import_name)
         CORS(self.app)
 
-        self.api = Api(app=self.app, version=__version__, title="pyCBR", description="pyCBR generated API REST")
+        self.api = Api(app=self.app, version=__version__, title="import_name", description="A pyCBR generated CBR API")
         self.api_namespace = self.api.namespace("api", description="General methods")
 
         self.app.config.update(
@@ -72,13 +79,13 @@ class CBRFlask:
             if data:
                 self.app.logger.info('Body: %s', data.decode())
 
-        self.case_base = case_base
+        self.case_base = cbr.case_base
 
         self.models = {}
         models = self.models
 
         self.models["version"] = self.api.model('Deployment configuration', {
-            'version': fields.String(description="Version code", example=__version__),
+            'version': fields.String(description="pycbr version code", example=__version__),
         })
 
         @self.api_namespace.route('/')
@@ -88,43 +95,46 @@ class CBRFlask:
                 """Check the CBR status, returning its version and configuration"""
                 return {"version": __version__}
 
-        # TODO: Add case structure marshall with it
+        case_example = _pandas_to_python(cbr.get_pandas().iloc[0])
 
-        self.models["cases"] = self.api.model('Cases', {
-            'cases': fields.List(fields.Raw, description="Cases", example=[("a", "b")]),
-        })
+        self.models["case"] = self.api.model('Case', {k: fields.Raw(example=v) for k, v in case_example.items()})
+
+        # TODO: List of cases marshalling
+        # self.models["cases"] = self.api.model('Cases', {'cases': fields.List(fields.Nested(self.models["case"]), description="Cases", example=[case_example])})
 
         @self.api_namespace.route('/cases/')
         class Cases(Resource):
             # @self.api.marshal_with(self.models["cases"], code=200, description='OK')
             def get(self):
                 """Check the cases in the case base"""
-                return {"cases": case_base.to_json(orient="records")}
+                return {"cases": _pandas_to_python(cbr.get_pandas())}
 
+            @self.api.expect(models["case"])
             def post(self):
                 """Add a case to the case base (non-idempotent operation)"""
-                raise NotImplementedError
+                cbr.add_case(request.json)
 
         @self.api_namespace.route('/cases/<string:case_id>')
         class Case(Resource):
-            # @self.api.marshal_with(self.models["cases"], code=200, description='OK')
-            # @self.api.expect(models["retrieve"])
+            # @self.api.marshal_with(self.models["case"], code=200, description='OK')
             def get(self, case_id):
                 """Check a case in the case base"""
-                raise NotImplementedError
+                return _pandas_to_python(cbr.get_case(case_id))
 
+            @self.api.expect(models["case"])
             def put(self, case_id):
                 """Add or update a case in the case base"""
-                raise NotImplementedError
+                cbr.add_case(request.json, case_id=case_id)
 
             def delete(self, case_id):
                 """Check a case in the case base"""
-                raise NotImplementedError
+                try:
+                    cbr.delete_case(case_id)
+                except KeyError:
+                    abort(404)
 
-        # Note the patch in the example, which is due to pd.DataFrame.to_dict returning numpy types
-        # Cf. https://github.com/pandas-dev/pandas/issues/16048
         self.models["retrieve"] = self.api.model('Retrieval', {
-            'case': fields.Raw(description="Case", example=json.loads(case_base.iloc[0].to_json())),
+            'case': fields.Nested(self.models["case"], description="Case", example=case_example),
             'k': fields.Integer(description="Number of neighbours", example=5)
         })
 
@@ -136,18 +146,19 @@ class CBRFlask:
                 """Retrieve the most similar cases"""
                 case = request.json.get("case")
                 k = request.json.get("k", 5)
-                df_sim, sims = recovery.find(pd.DataFrame([case]), k)[0]
+                df_sim, sims = cbr.recovery_model.find(pd.DataFrame([case]), k)[0]
                 return {"cases": [row.dropna().to_dict() for _, row in df_sim.iterrows()],
                         "cases_ids": [i for i, _ in df_sim.iterrows()],
                         "sims": sims.tolist()}
 
-        @self.api_namespace.route('/recommend/')
-        class Recommend(Resource):
-            # @self.api.marshal_with(self.models["cases"], code=200, description='OK')
-            @self.api.expect(models["retrieve"])
-            def post(self):
-                """Provide a recommendation using the most similar cases"""
-                case = request.json.get("case")
-                k = request.json.get("k", 5)
-                df_sim, sims = recovery.find(pd.DataFrame([case]), k)[0]
-                return {"recommendation": aggregator.aggregate(df_sim, sims)}
+        if cbr.aggregator is not None:
+            @self.api_namespace.route('/recommend/')
+            class Recommend(Resource):
+                # @self.api.marshal_with(self.models["cases"], code=200, description='OK')
+                @self.api.expect(models["retrieve"])
+                def post(self):
+                    """Provide a recommendation using the most similar cases"""
+                    case = request.json.get("case")
+                    k = request.json.get("k", 5)
+                    df_sim, sims = cbr.recovery_model.find(pd.DataFrame([case]), k)[0]
+                    return {"recommendation": cbr.aggregator.aggregate(df_sim, sims)}
