@@ -87,6 +87,9 @@ class CBRFlask:
 
         self.models["version"] = self.api.model('Deployment configuration', {
             'version': fields.String(description="pycbr version code", example=__version__),
+            'case_base': fields.Raw(description="Case base configuration"),
+            'recovery_model': fields.Raw(description="Recovery model"),
+            'aggregator': fields.Raw(description="Aggregation mechanism")
         })
 
         @self.api_namespace.route('/')
@@ -94,7 +97,10 @@ class CBRFlask:
             @self.api.marshal_with(self.models["version"], code=200, description='OK')
             def get(self):
                 """Check the CBR status, returning its version and configuration"""
-                return {"version": __version__}
+                return {"version": __version__, "case_base": cbr.case_base.get_description(),
+                        "recovery_model": cbr.recovery_model.get_description(),
+                        "aggregator": cbr.aggregator.get_description() if cbr.aggregator is not None else None
+                        }
 
         case_example = _pandas_to_python(cbr.get_pandas().iloc[0])
 

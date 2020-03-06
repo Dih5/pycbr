@@ -40,6 +40,10 @@ class CaseBase:
         """
         raise NotImplementedError
 
+    def get_description(self):
+        """Get a dictionary describing the instance"""
+        raise NotImplementedError
+
 
 class SimpleCSVCaseBase(CaseBase):
     """A CSV file storing the case base with no synchronization options"""
@@ -59,6 +63,10 @@ class SimpleCSVCaseBase(CaseBase):
         self.df = None
         self.df = self.get_pandas()
         self.header = list(self.df.columns)
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "path": self.path, "csv_kwargs": self.csv_kwargs}
 
     def get_pandas(self):
         # self.df is assumed to be up-to-date with the CSV

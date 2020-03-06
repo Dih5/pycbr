@@ -28,6 +28,10 @@ class Aggregate:
         """
         raise NotImplementedError
 
+    def get_description(self):
+        """Get a dictionary describing the instance"""
+        raise NotImplementedError
+
 
 class MajorityAggregate(Aggregate):
     """Solution aggregation by majority, possible weighted by similarity"""
@@ -41,6 +45,10 @@ class MajorityAggregate(Aggregate):
             self._f = operator.itemgetter(attribute)
         else:
             self._f = attribute
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "attribute": self.attribute, "weighted": self.weighted}
 
     def aggregate(self, neighbours, similarity):
         d = defaultdict(lambda: 0)
@@ -58,6 +66,11 @@ class ColumnRankAggregate(Aggregate):
         self.attributes = attributes
         self.true_values = true_values
         self.weighted = weighted
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "attributes": self.attributes, "true_values": self.true_values,
+                "weighted": self.weighted}
 
     def aggregate(self, neighbours, similarity):
         if not self.weighted:

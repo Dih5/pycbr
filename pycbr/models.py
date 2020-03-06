@@ -16,6 +16,10 @@ class Attribute(base.TransformerMixin, base.BaseEstimator):
     def similarity(self, x, y):
         raise NotImplementedError
 
+    def get_description(self):
+        """Get a dictionary describing the instance"""
+        raise NotImplementedError
+
 
 class LinearAttribute(Attribute):
     """A continuous attribute whose similarity is measured with a linear function
@@ -28,6 +32,10 @@ class LinearAttribute(Attribute):
     def __init__(self, max_value=None):
         super().__init__()
         self.max_value = max_value
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "max_value": self.max_value}
 
     def fit(self, X, y=None):
         if self.max_value is None:
@@ -53,6 +61,9 @@ class QuantileLinearAttribute(Attribute):
     def __init__(self):
         super().__init__()
         self.encoder = None
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__, }
 
     def fit(self, X, y=None):
         self.encoder = QuantileTransformer()
@@ -81,6 +92,10 @@ class KroneckerAttribute(Attribute):
 
         self.encoder = None
         self.encoded_undefined = []
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "encode": self.encode, "undefined": self.undefined}
 
     def fit(self, X, y=None):
         if self.encode:
@@ -120,6 +135,10 @@ class LinearOrdinalAttribute(Attribute):
         self.n = len(order)
         self.encoder = None
 
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "order": self.order, "undefined": self.undefined}
+
     def fit(self, X, y=None):
         self.encoder = OrdinalEncoder([self.order + list(self.undefined)])
         self.encoder.fit([[x] for x in self.order + list(self.undefined)])  # Argument irrelevant
@@ -145,6 +164,11 @@ class MatrixOrdinalAttribute(Attribute):
 
         self.n = len(values)
         self.encoder = None
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "values": self.values, "matrix": self.matrix,
+                "undefined": self.undefined}
 
     def fit(self, X, y=None):
         self.encoder = OrdinalEncoder([self.values + list(self.undefined)], dtype=int)

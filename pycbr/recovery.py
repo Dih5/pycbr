@@ -51,6 +51,7 @@ class Recovery:
         self.attributes = attributes
         self.na_strategy = na_strategy.lower()
         self.na_fill = na_fill
+        self.algorithm = algorithm
 
         if any(len(x) == 3 for x in attributes):  # At least one weight
             # An error may raise if a weight is absent
@@ -72,6 +73,12 @@ class Recovery:
         self.transformed = None
         # Index of the transformed instances in the original df
         self._index = None
+
+    def get_description(self):
+        attributes = [[a[0]] + [a[1].get_description()] + list(a[2:]) for a in self.attributes]
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "attributes": attributes, "na_strategy": self.na_strategy,
+                "na_fill": self.na_fill, "algorithm": self.algorithm}
 
     def _deal_with_na(self, X):
         """Transform a dataframe according to the na_strategy of the instance"""
