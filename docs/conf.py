@@ -35,6 +35,7 @@ if os.environ.get('READTHEDOCS') == 'True':
 
 
     MOCK_MODULES = ["numpy", "pandas", "sklearn",
+                    "sklearn.base", "sklearn.preprocessing", "sklearn.neighbors", "sklearn.compose", 
                     "flask", "flask-restplus", "flask-cors",
                     "coloredlogs", "pyyaml"
                     ]
