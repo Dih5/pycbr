@@ -64,3 +64,17 @@ def test_linear_continuous_similarity():
                     (50, 0, 1 - 50 / 100),
                     (20, 40, 1 - 20 / 100)]:
         assert abs(a.similarity(x, y) - s) < eps
+
+
+def test_exponential_continuous_similarity():
+    """Test exponential similarities"""
+    a = models.ExponentialAttribute(0.5)
+
+    a.fit(None)
+
+    for x, y, s in [(10, 10, 1.0),
+                    (20, 20, 1.0),
+                    (0, 3, 0.5 ** 3),
+                    (3, 0, 0.5 ** 3),
+                    ]:
+        assert abs(a.similarity(x, y) - s) < eps

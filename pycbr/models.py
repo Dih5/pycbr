@@ -49,6 +49,36 @@ class LinearAttribute(Attribute):
         return max(1 - abs(x - y) / self.max_value, 0)
 
 
+class ExponentialAttribute(Attribute):
+    """A continuous attribute whose similarity is measured with a exponential function
+
+    The attribute similarity function is defined by
+    :math:`\\mathrm{sim}_a(x, y)= a^{\\left|x-y\\right|}`,
+    where :math:`a \\in [0, 1]`.
+
+    """
+
+    def __init__(self, base=None):
+        super().__init__()
+        assert 0 <= base <= 1
+        self.base = base
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "base": self.base}
+
+    def fit(self, X, y=None):
+        if self.base is None:
+            raise NotImplementedError("Automatic range not yet available")
+        return self
+
+    def transform(self, X, y=None):
+        return X
+
+    def similarity(self, x, y):
+        return self.base ** abs(x - y)
+
+
 class QuantileLinearAttribute(Attribute):
     """A continuous attribute whose similarity is measured with a linear function on the quantiles
 
