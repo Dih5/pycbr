@@ -96,7 +96,7 @@ class QuantileLinearAttribute(Attribute):
         return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__, }
 
     def fit(self, X, y=None):
-        self.encoder = QuantileTransformer()
+        self.encoder = QuantileTransformer(min(1000, len(X)))
         self.encoder.fit(X)
         return self
 
