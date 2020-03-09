@@ -6,3 +6,13 @@ python:
 - 3.5
 install: pip install -U tox-travis
 script: tox
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: __token__
+  password:
+    secure: kCCPn781fvpStk1vok/GPu/gJNE5cEnvFAE0OUS+dDoxc7ThuU5++rCEutNDKNRxJWwFVgfkVjFpE4az2fnkzE5R/mOyNkVhzc6Rb09z4CQTqY1+iJe6m7JGHsWyNKh4HFulsRn41oix/Dr28SyhNbKyQOEmI3TEY3pR7hHGdCv+9NXTV7S/U538MNMp8eJMBOzPHDo4MwB+nE8LCE9GkVzeljQV/XTuF+3rA9/DjkWXf/H8DqPgXSvPtJwFteWNJ8sTv/PeWWDy3+xG+ZeaXhC7henuCrpmOlSOGMQM1OOJk7eVw0aVhLMqCN1a0tFGChEJhz9afVoGZYilHX7F4Y7upWL7f5U/kTIrrNAQcZaoYRiDU/ukFsSO882dWl14UsX1Mcz4EZuGJieBOPJb7TmldYmvYDSPZdon/xMLPES7EssODl4y7tQ0EYX17UNCmYQGkW/fDL9F9qLNmeAQUoztC3NF2kAGF8dHkm4W3T9BaDb7T2JDKEr81oP4/U+uhC7HXSPBg4op9tVyP9LRwe0BgpXnj1df3wDE9Pmdg3vcB8cc0x+bvVZVbwqInwyLxU2KGf0MqJ9m7ZsjHJYS/FVM4IGt0H0aCpdPXPuWnyhePBzzuUG8r/n/luS5tRa8VxzNSP+ihxJJ2PZfpUkyzsNZjNt3Teox6nt43U4m2DA=
+  on:
+    tags: true
+    repo: Dih5/pycbr
+    python: 3.6
