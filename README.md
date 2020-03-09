@@ -1,6 +1,12 @@
 # pycbr
+[![PyPI](https://img.shields.io/pypi/v/pycbr.svg)](https://pypi.python.org/pypi/pycbr)
 
-Package to implement Case-Based Reasoning systems
+[![license LGPLv3](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://raw.githubusercontent.com/Dih5/pycbr/master/LICENSE.txt)
+
+[![Build Status](https://travis-ci.org/Dih5/pycbr.svg?branch=master)](https://travis-ci.org/Dih5/pycbr)
+[![Documentation Status](https://readthedocs.org/projects/pycbr/badge/?version=latest)](http://pycbr.readthedocs.io/en/latest/?badge=latest)
+
+Microframework to implement Case-Based Reasoning systems
 
 
 ## Installation
