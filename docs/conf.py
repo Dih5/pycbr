@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.abspath('..'))
 if os.environ.get('READTHEDOCS') == 'True':
     autodoc_mock_imports = ["numpy", "pandas", "sklearn",
                             "sklearn.base", "sklearn.preprocessing", "sklearn.neighbors", "sklearn.compose",
-                            "flask", "flask-restplus", "flask-cors",
+                            "flask", "flask-restx", "flask-cors",
                             "coloredlogs", "pyyaml"
                             ]
 
