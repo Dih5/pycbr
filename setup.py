@@ -10,9 +10,9 @@ if os.environ.get('READTHEDOCS') == 'True':
     requirements = []
 else:
     requirements = ["numpy", "pandas", "scikit-learn",
-                    "flask", "flask-restplus", "flask-cors",
+                    "flask", "flask-restx", "flask-cors",
                     "coloredlogs", "pyyaml",
-                    "werkzeug<1.0"  # Needed for flask-restplus
+                    "werkzeug<1.0"  # Needed for flask-restx
                     ]
 
 setup(author="Dih5",
