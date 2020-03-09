@@ -35,7 +35,8 @@ if os.environ.get('READTHEDOCS') == 'True':
 
 
     MOCK_MODULES = ["numpy", "pandas", "scikit-learn",
-                    "flask", "flask-restplus", "flask-cors"
+                    "flask", "flask-restplus", "flask-cors",
+                    "coloredlogs", "pyyaml"
                     ]
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
@@ -51,7 +52,7 @@ needs_sphinx = '1.3'  # Napoleon extension
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
-'sphinx.ext.viewcode', 
+'sphinx.ext.viewcode',
 'sphinx.ext.napoleon',
 'nbsphinx',
 'IPython.sphinxext.ipython_console_highlighting',
