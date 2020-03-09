@@ -103,6 +103,7 @@ class CBRFlask:
                         }
 
         case_example = _pandas_to_python(cbr.get_pandas().iloc[0])
+        case_example = {k: v for k, v in case_example.items() if k in [x[0] for x in cbr.recovery_model.attributes]}
 
         self.models["case"] = self.api.model('Case', {k: fields.Raw(example=v) for k, v in case_example.items()})
 
