@@ -34,7 +34,7 @@ if os.environ.get('READTHEDOCS') == 'True':
             return MagicMock()
 
 
-    MOCK_MODULES = ["numpy", "pandas", "scikit-learn",
+    MOCK_MODULES = ["numpy", "pandas", "sklearn",
                     "flask", "flask-restplus", "flask-cors",
                     "coloredlogs", "pyyaml"
                     ]
