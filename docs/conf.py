@@ -25,21 +25,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # Mock the needed packages on RTD
 # http://docs.readthedocs.io/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
 if os.environ.get('READTHEDOCS') == 'True':
-    from unittest.mock import MagicMock
-
-
-    class Mock(MagicMock):
-        @classmethod
-        def __getattr__(cls, name):
-            return MagicMock()
-
-
-    MOCK_MODULES = ["numpy", "pandas", "sklearn",
+    autodoc_mock_imports = ["numpy", "pandas", "sklearn",
                     "sklearn.base", "sklearn.preprocessing", "sklearn.neighbors", "sklearn.compose", 
                     "flask", "flask-restplus", "flask-cors",
                     "coloredlogs", "pyyaml"
                     ]
-    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 import pycbr
 
