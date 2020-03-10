@@ -103,7 +103,7 @@ class CBRFlask:
                         }
 
         case_example = _pandas_to_python(cbr.get_pandas().iloc[0])
-        case_example = {k: v for k, v in case_example.items() if k in [x[0] for x in cbr.recovery_model.attributes]}
+        retrieve_example = {k: v for k, v in case_example.items() if k in [x[0] for x in cbr.recovery_model.attributes]}
 
         self.models["case"] = self.api.model('Case', {k: fields.Raw(example=v) for k, v in case_example.items()})
 
@@ -142,7 +142,7 @@ class CBRFlask:
                     abort(404)
 
         self.models["retrieve"] = self.api.model('Retrieval', {
-            'case': fields.Nested(self.models["case"], description="Case", example=case_example),
+            'case': fields.Nested(self.models["case"], description="Case", example=retrieve_example),
             'k': fields.Integer(description="Number of neighbours", example=5)
         })
 
