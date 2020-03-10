@@ -45,6 +45,38 @@ class CaseBase:
         raise NotImplementedError
 
 
+class PandasCaseBase(CaseBase):
+    """A case base defined from a pandas dataframe with no persistence"""
+
+    def __init__(self, df):
+        """
+
+        Args:
+            df (pandas.DataFrame): DataFrame.
+        """
+        super().__init__()
+        self.df = df
+
+        self.header = list(self.df.columns)
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__,
+                "df": "<<pandas Dataframe>>"}
+
+    def get_pandas(self):
+        return self.df
+
+    def add_case(self, case, case_id=None):
+        if case_id is None:
+            self.df = self.df.append(case, ignore_index=True)
+        else:
+            df2 = pd.DataFrame([case], columns=self.header)
+            self.df.loc[case_id] = df2.iloc[0]
+
+    def delete_case(self, case_id):
+        self.df.drop(case_id, inplace=True)
+
+
 class SimpleCSVCaseBase(CaseBase):
     """A CSV file storing the case base with no synchronization options"""
 
