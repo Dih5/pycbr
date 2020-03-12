@@ -135,7 +135,7 @@ class CBRFlask:
                 cbr.add_case(request.json, case_id=case_id)
 
             def delete(self, case_id):
-                """Check a case in the case base"""
+                """Delete a case from the case base"""
                 try:
                     cbr.delete_case(case_id)
                 except KeyError:
