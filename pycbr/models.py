@@ -5,6 +5,9 @@ Module with models to define attribute similarity
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, QuantileTransformer
 from sklearn import base
+from sklearn.metrics.pairwise import cosine_similarity
+
+from . import nlp
 
 
 class Attribute(base.TransformerMixin, base.BaseEstimator):
@@ -212,3 +215,26 @@ class MatrixOrdinalAttribute(Attribute):
         if x >= self.n or y >= self.n:
             return np.nan
         return self.matrix[x][y]
+
+
+class TextAttribute(Attribute):
+    """A textual attribute whose similarity is measured after a vectorization"""
+
+    def __init__(self):
+        super().__init__()
+        # TODO: Expose vectorizer configuaration
+        self.vectorizer = None
+
+    def get_description(self):
+        return {"__class__": self.__class__.__module__ + "." + self.__class__.__name__}
+
+    def fit(self, X, y=None):
+        self.vectorizer = nlp.TextVectorizer()
+        self.vectorizer.fit(X)
+        return self
+
+    def transform(self, X, y=None):
+        return self.vectorizer.transform(X)
+
+    def similarity(self, x, y):
+        return cosine_similarity(x, y)[0]

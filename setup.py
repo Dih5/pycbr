@@ -32,6 +32,7 @@ setup(author="Dih5",
       extras_require={
           "docs": ["nbsphinx", "sphinx-rtd-theme", "IPython"],
           "test": ["pytest"],
+          "text": ["nltk"],
       },
       keywords=[],
       name='pycbr',
