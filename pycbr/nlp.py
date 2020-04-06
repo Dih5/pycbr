@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 try:
     import nltk
     from nltk.corpus import stopwords as sw
-except ModuleNotFoundError:
+except ImportError:
     nltk = None
     sw = None
 
