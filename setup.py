@@ -6,6 +6,10 @@
 import os
 from setuptools import setup, find_packages
 
+# Get the long description from the README file
+with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md')) as f:
+    long_description = f.read()
+    
 if os.environ.get('READTHEDOCS') == 'True':
     requirements = []
 else:
@@ -35,6 +39,8 @@ setup(author="Dih5",
           "text": ["nltk"],
       },
       keywords=[],
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       name='pycbr',
       packages=find_packages(include=['pycbr'], exclude=["demos", "tests", "docs"]),
       install_requires=requirements,
