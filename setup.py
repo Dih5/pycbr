@@ -24,7 +24,7 @@ setup(author="Dih5",
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Science/Research',
-          'OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)'
+          'OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
           'Natural Language :: English',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.5',
