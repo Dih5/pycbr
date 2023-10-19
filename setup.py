@@ -39,6 +39,6 @@ setup(author="Dih5",
       packages=find_packages(include=['pycbr'], exclude=["demos", "tests", "docs"]),
       install_requires=requirements,
       url='https://github.com/dih5/pycbr',
-      version='0.1.1',
+      version='0.2.0',
 
       )
